@@ -20,6 +20,11 @@ if (BUILD_PYTHON)
     find_package(pybind11 REQUIRED)
 endif()
 
+option(BUILD_JAVA "Build Java bindings with jextract" OFF)
+if (BUILD_JAVA)
+  include(JavaBindings.cmake)
+endif()
+
 
 # call the CMakeLists.txt to make the documentation (Doxygen)
 # > 'make html' to generate the documentation
