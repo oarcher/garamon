@@ -11,7 +11,6 @@
 /// \author Stephane Breuils, Vincent Nozick
 /// \brief Core of the library generator.
 
-
 #include <iostream>
 #include <algorithm>
 
@@ -88,6 +87,10 @@ int main(int argc, char** argv){
     substitute(data,"cmake_project_name_original_case", metaData.namespaceName);
     writeFile(data, projectDirectory + "/CMakeLists.txt");
 
+    // add the JavaBindings.cmake
+    data = readFile(templateDataDirectory + "JavaBindings.cmake");
+    substitute(data, "cmake_project_name_original_case", metaData.namespaceName);
+    writeFile(data, projectDirectory + "/JavaBindings.cmake");
 
     // add the documentation CMakeLists.txt
     data = readFile(templateDataDirectory + "doc/CMakeLists.txt");
@@ -264,8 +267,49 @@ int main(int argc, char** argv){
 
 
     // Mvec.cpp
+    // data = readFile(templateDataDirectory + "Mvec.cpp");
+    // substitute(data, "project_namespace", metaData.namespaceName);
+    // writeFile(data, srcDirectory + "/Mvec.cpp");
+
+    // Mvec.h (C wrapper)
+    std::cout << "  Mvec C wrapper header ..." << std::endl;
+    data = readFile(templateDataDirectory + "Mvec.h");
+    substitute(data, "project_inclusion_guard", upperCaseNamespace + "_MVEC_H__");
+    substitute(data, "project_namespace", metaData.namespaceName);
+    substitute(data, "project_static_multivector_one_component", multivectorComponentBuilder(metaData, staticOneComponentMultivectorPrototypeH())); // i.e. Mvec a = 2 * cga::e12()
+    if (metaData.fullRankMetric == true)
+    {
+        // keep the dual and other functions
+        substitute(data, "project_singular_metric_comment_begin", "");
+        substitute(data, "project_singular_metric_comment_end", "");
+    }
+    else
+    {
+        // comment the dual and other functions
+        substitute(data, "project_singular_metric_comment_begin", singularMetricCommentBegin());
+        substitute(data, "project_singular_metric_comment_end", singularMetricCommentEnd());
+    }
+    substitute(data, "project_basis_vector_index", multivectorComponentBuilder(metaData, constantsDefinition()));
+    writeFile(data, srcDirectory + "/Mvec.h");
+
+    // Mvec.cpp (C wrapper)
+    std::cout << "  Mvec C wrapper source ..." << std::endl;
     data = readFile(templateDataDirectory + "Mvec.cpp");
     substitute(data,"project_namespace", metaData.namespaceName);
+    // substitute(data, "project_c_wrapper_mvec_cpp_functions", generateCWrapperMvecCppFunctions(metaData));
+    substitute(data, "project_static_multivector_one_component", multivectorComponentBuilder(metaData, staticOneComponentMultivectorPrototypeC())); // i.e. Mvec a = 2 * cga::e12()
+    if (metaData.fullRankMetric == true)
+    {
+        // keep the dual and other functions
+        substitute(data, "project_singular_metric_comment_begin", "");
+        substitute(data, "project_singular_metric_comment_end", "");
+    }
+    else
+    {
+        // comment the dual and other functions
+        substitute(data, "project_singular_metric_comment_begin", singularMetricCommentBegin());
+        substitute(data, "project_singular_metric_comment_end", singularMetricCommentEnd());
+    }
     writeFile(data, srcDirectory + "/Mvec.cpp");
 
 
@@ -357,6 +401,21 @@ int main(int argc, char** argv){
     substitute(data,"project_first_vector_basis", metaData.basisVectorName[0]);
     substitute(data,"project_second_vector_basis", metaData.basisVectorName[1]);
     writeFile(data, srcSampleDirectory + "/main.cpp");
+
+    // add the sample Main.java
+    data = readFile(templateDataDirectory + "sample/src/Main.java");
+    substitute(data, "project_namespace", metaData.namespaceName);
+    substitute(data, "project_first_vector_basis", metaData.basisVectorName[0]);
+    substitute(data, "project_second_vector_basis", metaData.basisVectorName[1]);
+    writeFile(data, srcSampleDirectory + "/Main.java");
+
+    // add the sample Mvec.java (TODO: move to package)
+    data = readFile(templateDataDirectory + "sample/src/Mvec.java");
+    substitute(data, "project_namespace", metaData.namespaceName);
+    substitute(data, "project_first_vector_basis", metaData.basisVectorName[0]);
+    substitute(data, "project_second_vector_basis", metaData.basisVectorName[1]);
+    substitute(data, "project_static_multivector_one_component", multivectorComponentBuilder(metaData, staticOneComponentMultivectorPrototypeJava())); // i.e. Mvec a = 2 * cga::e12()
+    writeFile(data, srcSampleDirectory + "/Mvec.java");
 
     // PythonBindings.cpp
     data = readFile(templateDataDirectory + "PythonBindings.cpp");

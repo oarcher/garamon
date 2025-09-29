@@ -52,6 +52,12 @@ std::string dualPermutationToString(const std::vector<double>& basisChangesCompo
 
 std::string staticOneComponentMultivectorPrototypePython();
 
+std::string staticOneComponentMultivectorPrototypeH();
+
+std::string staticOneComponentMultivectorPrototypeC();
+
+std::string staticOneComponentMultivectorPrototypeJava();
+
 std::string staticOneComponentMultivectorPrototype();
 
 std::string oneComponentMultivectorPrototype();
