@@ -55,10 +55,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
 # generate a library
+add_library(cmake_project_name_original_case SHARED ${source_files} ${header_files})
 if (MSVC)
-	add_library(cmake_project_name_original_case STATIC ${source_files} ${header_files})
-else()
-	add_library(cmake_project_name_original_case SHARED ${source_files} ${header_files})
+  set_target_properties(cmake_project_name_original_case PROPERTIES
+    WINDOWS_EXPORT_ALL_SYMBOLS ON
+  )
 endif()
 
 if (BUILD_PYTHON)
