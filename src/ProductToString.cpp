@@ -339,6 +339,11 @@ std::string constantsDefinition(){
     return res;
 }
 
+std::string constantsDefinitionJava(){
+    std::string res = "    public static int Eproject_name_blade = project_xor_index_blade;\n";
+    return res;
+}
+
 // in case the metric is not full rank, the pseudo scalar will be 0, thus it is not possible to compute some operation like dual.
 // this functions will thus be commented on the source code
 std::string singularMetricCommentBegin(){

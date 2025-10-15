@@ -4,14 +4,21 @@ import java.util.Arrays;
 public class Main {
   public static void main(String[] args) {
     // mv1[scalar]=1 ; mv1[Eproject_first_vector_basis]=42
-    Mvec mv1 = Mvec.scalar(1.0).add(Mvec.eproject_first_vector_basis().rmul(42.0));
+    Mvec mv1 = Mvec.empty();
+    mv1.at(Mvec.SCALAR, 1.0);
+    mv1.at(Mvec.Eproject_first_vector_basis, 42.0);
+    // Mvec mv1 = Mvec.scalar(1.0).add(Mvec.eproject_first_vector_basis().rmul(42.0));
     System.out.print("mv1 : ");
     mv1.display();
 
     // mv2[Eproject_first_vector_basis]=1 ; mv2[Eproject_second_vector_basis]=2 ; mv2 += I() + 2*eproject_second_vector_basis()
-    Mvec mv2 = Mvec.eproject_first_vector_basis().rmul(1.0)
-        .add(Mvec.eproject_second_vector_basis().rmul(2.0))
-        .add(Mvec.I().add(Mvec.eproject_first_vector_basisproject_second_vector_basis().rmul(2.0)));
+    Mvec mv2 = Mvec.empty();
+    mv2.at(Mvec.Eproject_first_vector_basis, 1.0);
+    mv2.at(Mvec.Eproject_second_vector_basis, 2.0);
+    mv2 = mv2.add(Mvec.I().add(Mvec.eproject_first_vector_basisproject_second_vector_basis().rmul(2.0)));
+    // Mvec mv2 = Mvec.eproject_first_vector_basis().rmul(1.0)
+    //     .add(Mvec.eproject_second_vector_basis().rmul(2.0))
+    //     .add(Mvec.I().add(Mvec.eproject_first_vector_basisproject_second_vector_basis().rmul(2.0)));
     System.out.print("mv2 : ");
     mv2.display();
     System.out.println();

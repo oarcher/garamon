@@ -64,6 +64,8 @@ std::string oneComponentMultivectorPrototype();
 
 std::string constantsDefinition();
 
+std::string constantsDefinitionJava();
+
 std::string singularMetricCommentBegin();
 
 std::string singularMetricCommentEnd();

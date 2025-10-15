@@ -127,11 +127,11 @@ project_static_multivector_one_component
         return Mvec_h.Mvec_to_scalar(seg());
     }
 
-    public void setCoeff(int i, double v) {
+    public void set(int i, double v) {
         Mvec_h.Mvec_set_coeff(seg(), i, v);
     }
 
-    public double getCoeff(int i) {
+    public double get(int i) {
         return Mvec_h.Mvec_get_coeff(seg(), i);
     }
 
@@ -147,10 +147,19 @@ project_static_multivector_one_component
         Mvec_h.Mvec_clear(seg(), -1);
     }
 
+    public double at(int idx) { 
+        return get(idx); 
+    }
+    
+    public void at(int idx, double val) { 
+        set(idx, val); 
+    }
+
     @Override
     public void close() {
         cleanable.clean();
     }
 
-    // public static final int SCALAR = 0, E1 = 1, E2 = 2, E12 = 3;
+    public static final int SCALAR = 0;
+    project_basis_vector_index
 }

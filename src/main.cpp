@@ -417,6 +417,7 @@ int main(int argc, char** argv){
     substitute(data, "project_first_vector_basis", metaData.basisVectorName[0]);
     substitute(data, "project_second_vector_basis", metaData.basisVectorName[1]);
     substitute(data, "project_static_multivector_one_component", multivectorComponentBuilder(metaData, staticOneComponentMultivectorPrototypeJava())); // i.e. Mvec a = 2 * cga::e12()
+    substitute(data, "project_basis_vector_index", multivectorComponentBuilder(metaData, constantsDefinitionJava()));
     writeFile(data, srcJavaDirectory + "/Mvec.java");
 
     // PythonBindings.cpp
