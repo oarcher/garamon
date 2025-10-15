@@ -339,7 +339,7 @@ namespace project_namespace{
         /// \brief boolean operator that tests the equality between two Mvec
         /// \param mv2 - second operand of type Mvec
         /// \return whether two Mvec have the same coefficients
-        inline bool operator==(const Mvec& mv2){
+        inline bool operator==(const Mvec& mv2) const {
             if(gradeBitmap != mv2.gradeBitmap)
                 return false;
 
@@ -354,7 +354,7 @@ namespace project_namespace{
             /// \brief operator to test whether two Mvec have not the same coefficients
         /// \param mv2 - second operand of type Mvec
         /// \return boolean that specify the non-equality between two Mvec
-        inline bool operator!=(const Mvec& mv2){
+        inline bool operator!=(const Mvec& mv2) const {
             return !(*this == mv2); // issue #4 fixed by replacing Not !(mvData == mv2.mvData) with !(*this == mv2)
         }
 

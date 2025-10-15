@@ -15,390 +15,449 @@
 #include "project_namespace/Mvec.hpp"
 #include <vector>   // For Mvec_get_grades
 #include <iostream> // For Mvec_display
+#include <cassert>
+
+
 
 using namespace project_namespace;
 
-// Private definition of the opaque Mvec_C
-struct Mvec_C
-{
-    project_namespace::Mvec<double> *p;
-};
+// --- helpers: opaque handle <-> C++ type ----
+static inline Mvec<double>*       to_impl(Mvec_C h)       { return reinterpret_cast<Mvec<double>*>(h); }
+static inline Mvec<double> const* to_impl_c(Mvec_C h)     { return reinterpret_cast<Mvec<double> const*>(h); }
+static inline Mvec_C              to_handle(Mvec<double>* p){ return reinterpret_cast<Mvec_C>(p); }
 
-static Mvec_C *wrap(project_namespace::Mvec<double> *ptr)
-{
-    Mvec_C *h = new Mvec_C;
-    h->p = ptr;
-    return h;
-}
+// All exported C functions
+extern "C" {
 
 // --- Constructors and Destructor ---
 
-Mvec_C *Mvec_new_empty(void)
+Mvec_C Mvec_new_empty(void)
 {
-    return wrap(new Mvec<double>());
+    return to_handle(new Mvec<double>());
 }
 
-Mvec_C *Mvec_new_copy(const Mvec_C *mv)
+Mvec_C Mvec_new_copy(Mvec_C mv)
 {
-    return wrap(new Mvec<double>(*mv->p));
+    assert(mv);
+    return to_handle(new Mvec<double>(*to_impl_c(mv)));
 }
 
-Mvec_C *Mvec_new_scalar(double val)
+Mvec_C Mvec_new_scalar(double val)
 {
-    return wrap(new Mvec<double>(val));
+    return to_handle(new Mvec<double>(val));
 }
 
-void Mvec_delete(Mvec_C *mv)
+void Mvec_delete(Mvec_C mv)
 {
-    delete mv->p;
-    delete mv;
+    delete to_impl(mv);
 }
 
 // --- Assignment Operators ---
 
-void Mvec_assign_copy(Mvec_C *dest, const Mvec_C *src)
+void Mvec_assign_copy(Mvec_C dest, Mvec_C src)
 {
-    *(dest->p) = *(src->p);
+    assert(dest && src);
+    *to_impl(dest) = *to_impl_c(src);
 }
 
 // --- Arithmetic Operators ---
 
-Mvec_C *Mvec_add(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_add(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(*mv1->p + *mv2->p));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(*to_impl_c(mv1) + *to_impl_c(mv2)));
 }
 
-Mvec_C *Mvec_add_scalar(const Mvec_C *mv, double value)
+Mvec_C Mvec_add_scalar(Mvec_C mv, double value)
 {
-    return wrap(new Mvec<double>(*mv->p + value));
+    assert(mv);
+    return to_handle(new Mvec<double>(*to_impl_c(mv) + value));
 }
 
-// Mvec_C *Mvec_scalar_add(double value, const Mvec_C *mv)
+// Mvec_C Mvec_scalar_add(double value, Mvec_C mv)
 // {
-//     return wrap(new Mvec<double>(value + *mv->p));
+//     assert(mv);
+//     return to_handle(new Mvec<double>(value + *to_impl_c(mv)));
 // }
 
-void Mvec_add_assign(Mvec_C *dest, const Mvec_C *src)
+void Mvec_add_assign(Mvec_C dest, Mvec_C src)
 {
-    *(dest->p) += *(src->p);
+    assert(dest && src);
+    *to_impl(dest) += *to_impl_c(src);
 }
 
-Mvec_C *Mvec_negate(const Mvec_C *mv)
+Mvec_C Mvec_negate(Mvec_C mv)
 {
-    return wrap(new Mvec<double>(-(*mv->p)));
+    assert(mv);
+    return to_handle(new Mvec<double>(-*to_impl_c(mv)));
 }
 
-Mvec_C *Mvec_sub(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_sub(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(*mv1->p - *mv2->p));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(*to_impl_c(mv1) - *to_impl_c(mv2)));
 }
 
-Mvec_C *Mvec_sub_scalar(const Mvec_C *mv, double value)
+Mvec_C Mvec_sub_scalar(Mvec_C mv, double value)
 {
-    return wrap(new Mvec<double>(*mv->p - value));
+    assert(mv);
+    return to_handle(new Mvec<double>(*to_impl_c(mv) - value));
 }
 
-// Mvec_C *Mvec_scalar_sub(double value, const Mvec_C *mv)
+// Mvec_C Mvec_scalar_sub(double value, Mvec_C mv)
 // {
-//     return wrap(new Mvec<double>(value - *mv->p));
+//     assert(mv);
+//     return to_handle(new Mvec<double>(value - *to_impl_c(mv)));
 // }
 
-void Mvec_sub_assign(Mvec_C *dest, const Mvec_C *src)
+void Mvec_sub_assign(Mvec_C dest, Mvec_C src)
 {
-    *(dest->p) -= *(src->p);
+    assert(dest && src);
+    *to_impl(dest) -= *to_impl_c(src);
 }
 
 // --- Geometric Product Operators ---
 
-Mvec_C *Mvec_mul(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_mul(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(*mv1->p * *mv2->p));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(*to_impl_c(mv1) * *to_impl_c(mv2)));
 }
 
-Mvec_C *Mvec_mul_scalar(const Mvec_C *mv, double value)
+Mvec_C Mvec_mul_scalar(Mvec_C mv, double value)
 {
-    return wrap(new Mvec<double>(*mv->p * value));
+    assert(mv);
+    return to_handle(new Mvec<double>(*to_impl_c(mv) * value));
 }
 
-Mvec_C *Mvec_scalar_mul(double value, const Mvec_C *mv)
+Mvec_C Mvec_scalar_mul(double value, Mvec_C mv)
 {
-    return wrap(new Mvec<double>(value * *mv->p));
+    assert(mv);
+    return to_handle(new Mvec<double>(value * *to_impl_c(mv)));
 }
 
-void Mvec_mul_assign(Mvec_C *dest, const Mvec_C *src)
+void Mvec_mul_assign(Mvec_C dest, Mvec_C src)
 {
-    *(dest->p) *= *(src->p);
+    assert(dest && src);
+    *to_impl(dest) *= *to_impl_c(src);
 }
 
-Mvec_C *Mvec_div(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_div(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(*mv1->p / *mv2->p));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(*to_impl_c(mv1) / *to_impl_c(mv2)));
 }
 
-Mvec_C *Mvec_div_scalar(const Mvec_C *mv, double value)
+Mvec_C Mvec_div_scalar(Mvec_C mv, double value)
 {
-    return wrap(new Mvec<double>(*mv->p / value));
+    assert(mv);
+    return to_handle(new Mvec<double>(*to_impl_c(mv) / value));
 }
 
-Mvec_C *Mvec_scalar_div(double value, const Mvec_C *mv)
+Mvec_C Mvec_scalar_div(double value, Mvec_C mv)
 {
-    return wrap(new Mvec<double>(value / *mv->p));
+    assert(mv);
+    return to_handle(new Mvec<double>(value / *to_impl_c(mv)));
 }
 
-void Mvec_div_assign(Mvec_C *dest, const Mvec_C *src)
+void Mvec_div_assign(Mvec_C dest, Mvec_C src)
 {
-    *(dest->p) /= *(src->p);
+    assert(dest && src);
+    *to_impl(dest) /= *to_impl_c(src);
 }
 
-void Mvec_div_assign_scalar(Mvec_C *dest, double value)
+void Mvec_div_assign_scalar(Mvec_C dest, double value)
 {
-    *(dest->p) /= value;
+    assert(dest);
+    *to_impl(dest) /= value;
 }
 
 // --- Outer Product Operators ---
 
-Mvec_C *Mvec_outer(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_outer(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(*mv1->p ^ *mv2->p));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(*to_impl_c(mv1) ^ *to_impl_c(mv2)));
 }
 
-Mvec_C *Mvec_outer_scalar(const Mvec_C *mv, double value)
+Mvec_C Mvec_outer_scalar(Mvec_C mv, double value)
 {
-    return wrap(new Mvec<double>(*mv->p ^ value));
+    assert(mv);
+    return to_handle(new Mvec<double>(*to_impl_c(mv) ^ value));
 }
 
-Mvec_C *Mvec_scalar_outer(double value, const Mvec_C *mv)
+Mvec_C Mvec_scalar_outer(double value, Mvec_C mv)
 {
-    return wrap(new Mvec<double>(value ^ *mv->p));
+    assert(mv);
+    return to_handle(new Mvec<double>(value ^ *to_impl_c(mv)));
 }
 
-void Mvec_outer_assign(Mvec_C *dest, const Mvec_C *src)
+void Mvec_outer_assign(Mvec_C dest, Mvec_C src)
 {
-    *(dest->p) ^= *(src->p);
+    assert(dest && src);
+    *to_impl(dest) ^= *to_impl_c(src);
 }
 
 // --- Inner Product Operators ---
 
-Mvec_C *Mvec_inner(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_inner(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(*mv1->p | *mv2->p));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(*to_impl_c(mv1) | *to_impl_c(mv2)));
 }
 
-Mvec_C *Mvec_inner_scalar(const Mvec_C *mv, double value)
+Mvec_C Mvec_inner_scalar(Mvec_C mv, double value)
 {
-    return wrap(new Mvec<double>(*mv->p | value));
+    assert(mv);
+    return to_handle(new Mvec<double>(*to_impl_c(mv) | value));
 }
 
-Mvec_C *Mvec_scalar_inner(double value, const Mvec_C *mv)
+Mvec_C Mvec_scalar_inner(double value, Mvec_C mv)
 {
-    return wrap(new Mvec<double>(value | *mv->p));
+    assert(mv);
+    return to_handle(new Mvec<double>(value | *to_impl_c(mv)));
 }
 
-void Mvec_inner_assign(Mvec_C *dest, const Mvec_C *src)
+void Mvec_inner_assign(Mvec_C dest, Mvec_C src)
 {
-    *(dest->p) |= *(src->p);
+    assert(dest && src);
+    *to_impl(dest) |= *to_impl_c(src);
 }
 
 // --- Contraction Operators ---
 
-Mvec_C *Mvec_right_contraction(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_right_contraction(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(*mv1->p > *mv2->p));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(*to_impl_c(mv1) > *to_impl_c(mv2)));
 }
 
-Mvec_C *Mvec_right_contraction_scalar(const Mvec_C *mv, double value)
+Mvec_C Mvec_right_contraction_scalar(Mvec_C mv, double value)
 {
-    return wrap(new Mvec<double>(*mv->p > value));
+    assert(mv);
+    return to_handle(new Mvec<double>(*to_impl_c(mv) > value));
 }
 
-Mvec_C *Mvec_scalar_right_contraction(double value, const Mvec_C *mv)
+Mvec_C Mvec_scalar_right_contraction(double value, Mvec_C mv)
 {
-    return wrap(new Mvec<double>(value > *mv->p));
+    assert(mv);
+    return to_handle(new Mvec<double>(value > *to_impl_c(mv)));
 }
 
-Mvec_C *Mvec_left_contraction(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_left_contraction(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(*mv1->p < *mv2->p));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(*to_impl_c(mv1) < *to_impl_c(mv2)));
 }
 
-Mvec_C *Mvec_left_contraction_scalar(const Mvec_C *mv, double value)
+Mvec_C Mvec_left_contraction_scalar(Mvec_C mv, double value)
 {
-    return wrap(new Mvec<double>(*mv->p < value));
+    assert(mv);
+    return to_handle(new Mvec<double>(*to_impl_c(mv) < value));
 }
 
-Mvec_C *Mvec_scalar_left_contraction(double value, const Mvec_C *mv)
+Mvec_C Mvec_scalar_left_contraction(double value, Mvec_C mv)
 {
-    return wrap(new Mvec<double>(value < *mv->p));
+    assert(mv);
+    return to_handle(new Mvec<double>(value < *to_impl_c(mv)));
 }
 
 // --- Other Mvec Methods ---
 
-Mvec_C *Mvec_reverse(const Mvec_C *mv)
+Mvec_C Mvec_reverse(Mvec_C mv)
 {
-    return wrap(new Mvec<double>(~(*mv->p)));
+    assert(mv);
+    return to_handle(new Mvec<double>(~(*to_impl_c(mv))));
 }
 
-bool Mvec_equals(const Mvec_C *mv1, const Mvec_C *mv2)
+bool Mvec_equals(Mvec_C mv1, Mvec_C mv2)
 {
-    return *(mv1->p) == *(mv2->p);
+    assert(mv1 && mv2);
+    return *to_impl_c(mv1) == *to_impl_c(mv2);
 }
 
-Mvec_C *Mvec_inv(const Mvec_C *mv)
+Mvec_C Mvec_inv(Mvec_C mv)
 {
-    return wrap(new Mvec<double>(mv->p->inv()));
+    assert(mv);
+    return to_handle(new Mvec<double>(to_impl_c(mv)->inv()));
 }
 
-bool Mvec_not_equals(const Mvec_C *mv1, const Mvec_C *mv2)
+bool Mvec_not_equals(Mvec_C mv1, Mvec_C mv2)
 {
-    return *(mv1->p) != *(mv2->p);
+    assert(mv1 && mv2);
+    return *to_impl_c(mv1) != *to_impl_c(mv2);
 }
 
-double Mvec_to_scalar(const Mvec_C *mv)
+double Mvec_to_scalar(Mvec_C mv)
 {
-    return static_cast<double>(*(mv->p));
+    assert(mv);
+    return (*to_impl_c(mv))[scalar];
 }
 
-double Mvec_get_coeff(const Mvec_C *mv, int idx)
+double Mvec_get_coeff(Mvec_C mv, int idx)
 {
-    return (*mv->p)[idx];
+    assert(mv);
+    return (*to_impl_c(mv))[idx];
 }
 
-void Mvec_set_coeff(Mvec_C *mv, int idx, double value)
+void Mvec_set_coeff(Mvec_C mv, int idx, double value)
 {
-    (*mv->p)[idx] = value;
+    assert(mv);
+    (*to_impl(mv))[idx] = value;
 }
 
-Mvec_C *Mvec_component_to_one(unsigned int grade, int index)
+Mvec_C Mvec_component_to_one(unsigned int grade, int index)
 {
     Mvec<double> temp_mv;
-    return wrap(new Mvec<double>(temp_mv.componentToOne(grade, index)));
+    return to_handle(new Mvec<double>(temp_mv.componentToOne(grade, index)));
 }
 
-double Mvec_norm(const Mvec_C *mv)
+double Mvec_norm(Mvec_C mv)
 {
-    return mv->p->norm();
+    assert(mv);
+    return to_impl_c(mv)->norm();
 }
 
-double Mvec_quadratic_norm(const Mvec_C *mv)
+double Mvec_quadratic_norm(Mvec_C mv)
 {
-    return mv->p->quadraticNorm();
+    assert(mv);
+    return to_impl_c(mv)->quadraticNorm();
 }
 
-int Mvec_get_highest_grade(const Mvec_C *mv)
+int Mvec_get_highest_grade(Mvec_C mv)
 {
-    return mv->p->grade();
+    assert(mv);
+    return to_impl_c(mv)->grade();
 }
 
 // FIXME: do not use malloc (copy to pre allocated array ?))
-unsigned int *Mvec_get_grades(const Mvec_C *mv, int *count)
+unsigned int* Mvec_get_grades(Mvec_C mv, int* count)
 {
-    std::vector<unsigned int> grades_vec = mv->p->grades();
-    *count = grades_vec.size();
-    unsigned int *grades_array = (unsigned int *)malloc(sizeof(unsigned int) * (*count));
-    for (int i = 0; i < *count; ++i)
-    {
-        grades_array[i] = grades_vec[i];
+    assert(mv && count);
+    std::vector<unsigned int> grades_vec = to_impl_c(mv)->grades();
+    *count = static_cast<int>(grades_vec.size());
+    unsigned int* grades_array = static_cast<unsigned int*>(
+        std::malloc(sizeof(unsigned int) * (*count)));
+    for (int i = 0; i < *count; ++i) {
+        grades_array[i] = grades_vec[static_cast<size_t>(i)];
     }
     return grades_array;
 }
 
-Mvec_C *Mvec_get_grade_component(const Mvec_C *mv, int grade)
+Mvec_C Mvec_get_grade_component(Mvec_C mv, int grade)
 {
-    return wrap(new Mvec<double>(mv->p->grade(grade)));
+    assert(mv);
+    return to_handle(new Mvec<double>(to_impl_c(mv)->grade(grade)));
 }
 
-bool Mvec_is_grade(const Mvec_C *mv, unsigned int grade)
+bool Mvec_is_grade(Mvec_C mv, unsigned int grade)
 {
-    return mv->p->isGrade(grade);
+    assert(mv);
+    return to_impl_c(mv)->isGrade(grade);
 }
 
-void Mvec_clear(Mvec_C *mv, int grade)
+void Mvec_clear(Mvec_C mv, int grade)
 {
-    mv->p->clear(grade);
+    assert(mv);
+    to_impl(mv)->clear(grade);
 }
 
-bool Mvec_is_empty(const Mvec_C *mv)
+bool Mvec_is_empty(Mvec_C mv)
 {
-    return mv->p->isEmpty();
+    assert(mv);
+    return to_impl_c(mv)->isEmpty();
 }
 
-bool Mvec_is_homogeneous(const Mvec_C *mv)
+bool Mvec_is_homogeneous(Mvec_C mv)
 {
-    return mv->p->isHomogeneous();
+    assert(mv);
+    return to_impl_c(mv)->isHomogeneous();
 }
 
-void Mvec_round_zero(Mvec_C *mv, double epsilon)
+void Mvec_round_zero(Mvec_C mv, double epsilon)
 {
-    mv->p->roundZero(epsilon);
+    assert(mv);
+    to_impl(mv)->roundZero(epsilon);
 }
 
-bool Mvec_same_grade(const Mvec_C *mv1, const Mvec_C *mv2)
+bool Mvec_same_grade(Mvec_C mv1, Mvec_C mv2)
 {
-    return mv1->p->sameGrade(*mv2->p);
+    assert(mv1 && mv2);
+    return to_impl_c(mv1)->sameGrade(*to_impl_c(mv2));
 }
 
-void Mvec_display(const Mvec_C *mv)
+void Mvec_display(Mvec_C mv)
 {
-    std::cout << *(mv->p) << std::endl;
+    assert(mv);
+    std::cout << *to_impl_c(mv) << std::endl;
 }
 
-Mvec_C *Mvec_extract_one_component(const Mvec_C *mv, int grade, int sizeOfKVector, int indexInKvector)
+Mvec_C Mvec_extract_one_component(Mvec_C mv, int grade, int sizeOfKVector, int indexInKvector)
 {
-    return wrap(new Mvec<double>(mv->p->extractOneComponent(grade, sizeOfKVector, indexInKvector)));
+    assert(mv);
+    return to_handle(new Mvec<double>(to_impl_c(mv)->extractOneComponent(grade, sizeOfKVector, indexInKvector)));
 }
 
 // Additional functions
-Mvec_C *Mvec_left_contraction_func(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_left_contraction_func(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(leftContraction(*mv1->p, *mv2->p)));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(leftContraction(*to_impl_c(mv1), *to_impl_c(mv2))));
 }
 
-Mvec_C *Mvec_right_contraction_func(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_right_contraction_func(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(rightContraction(*mv1->p, *mv2->p)));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(rightContraction(*to_impl_c(mv1), *to_impl_c(mv2))));
 }
 
-Mvec_C *Mvec_I(void)
+Mvec_C Mvec_I(void)
 {
-    return wrap(new Mvec<double>(I<double>()));
+    return to_handle(new Mvec<double>(I<double>()));
 }
 
-Mvec_C *Mvec_Iinv(void)
+Mvec_C Mvec_Iinv(void)
 {
-    return wrap(new Mvec<double>(Iinv<double>()));
+    return to_handle(new Mvec<double>(Iinv<double>()));
 }
 
-Mvec_C *Mvec_scalar_product(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_scalar_product(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(mv1->p->scalarProduct(*mv2->p)));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(to_impl_c(mv1)->scalarProduct(*to_impl_c(mv2))));
 }
 
-Mvec_C *Mvec_dot_product(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_dot_product(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(mv1->p->dotProduct(*mv2->p)));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(to_impl_c(mv1)->dotProduct(*to_impl_c(mv2))));
 }
 
 
 project_singular_metric_comment_begin
 
-Mvec_C *Mvec_outer_primal_dual(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_outer_primal_dual(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(mv1->p->outerPrimalDual(*mv2->p)));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(to_impl_c(mv1)->outerPrimalDual(*to_impl_c(mv2))));
 }
 
-Mvec_C *Mvec_outer_dual_primal(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_outer_dual_primal(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(mv1->p->outerDualPrimal(*mv2->p)));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(to_impl_c(mv1)->outerDualPrimal(*to_impl_c(mv2))));
 }
 
-Mvec_C *Mvec_outer_dual_dual(const Mvec_C *mv1, const Mvec_C *mv2)
+Mvec_C Mvec_outer_dual_dual(Mvec_C mv1, Mvec_C mv2)
 {
-    return wrap(new Mvec<double>(mv1->p->outerDualDual(*mv2->p)));
+    assert(mv1 && mv2);
+    return to_handle(new Mvec<double>(to_impl_c(mv1)->outerDualDual(*to_impl_c(mv2))));
 }
 
-Mvec_C *Mvec_dual(const Mvec_C *mv)
+Mvec_C Mvec_dual(Mvec_C mv)
 {
-    return wrap(new Mvec<double>(!(*mv->p)));
+    assert(mv);
+    return to_handle(new Mvec<double>(!(*to_impl_c(mv))));
 }
 
 project_singular_metric_comment_end
@@ -406,3 +465,5 @@ project_singular_metric_comment_end
 // --- Basis vector accessors ----
 
 project_static_multivector_one_component
+
+} // extern "C"

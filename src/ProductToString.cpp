@@ -294,12 +294,12 @@ std::string staticOneComponentMultivectorPrototypePython(){
 // example (c3ga): Mvec a = 3 * Mvec_e12();
 std::string staticOneComponentMultivectorPrototypeH(){
     std::string res = "    /// \\brief return a multivector that contains only the unit basis k-vector project_name_blade.\n";
-    res += "    Mvec_C *Mvec_eproject_name_blade(void);\n\n";
+    res += "    Mvec_C Mvec_eproject_name_blade(void);\n\n";
     return res;
 }
 std::string staticOneComponentMultivectorPrototypeC(){
     std::string res = "/// \\brief return a multivector that contains only the unit basis k-vector project_name_blade.\n";
-    res += "Mvec_C *Mvec_eproject_name_blade(void)\n{\n    Mvec<double> temp_mv;\n    return wrap(new Mvec<double>(temp_mv.componentToOne(project_grade_blade, project_homogeneous_index_blade)));\n}\n\n";
+    res += "Mvec_C Mvec_eproject_name_blade(void)\n{\n    Mvec<double> temp_mv;\n    return to_handle(new Mvec<double>(temp_mv.componentToOne(project_grade_blade, project_homogeneous_index_blade)));\n}\n\n";
     return res;
 }
 
