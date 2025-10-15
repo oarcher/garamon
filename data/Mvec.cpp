@@ -330,18 +330,20 @@ int Mvec_get_highest_grade(Mvec_C mv)
     return to_impl_c(mv)->grade();
 }
 
-// FIXME: do not use malloc (copy to pre allocated array ?))
-unsigned int* Mvec_get_grades(Mvec_C mv, int* count)
+unsigned int Mvec_get_grades_count(const Mvec_C mv)
 {
-    assert(mv && count);
-    std::vector<unsigned int> grades_vec = to_impl_c(mv)->grades();
-    *count = static_cast<int>(grades_vec.size());
-    unsigned int* grades_array = static_cast<unsigned int*>(
-        std::malloc(sizeof(unsigned int) * (*count)));
-    for (int i = 0; i < *count; ++i) {
-        grades_array[i] = grades_vec[static_cast<size_t>(i)];
-    }
-    return grades_array;
+    assert(mv);
+    return static_cast<int>(to_impl_c(mv)->grades().size());
+}
+
+/// \brief copy grades vector to *out (out must be pre allocated)
+int Mvec_copy_grades(Mvec_C mv, unsigned int* out, int cap) {
+    assert(mv && out && cap > 0);
+    const auto& v = to_impl_c(mv)->grades();
+    const int n = static_cast<int>(v.size());
+    const int w = std::min(n, cap);
+    for (int i = 0; i < w; ++i) out[i] = v[static_cast<size_t>(i)];
+    return w;
 }
 
 Mvec_C Mvec_get_grade_component(Mvec_C mv, int grade)

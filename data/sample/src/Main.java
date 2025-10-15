@@ -1,4 +1,5 @@
 import org.garamon.project_namespace.Mvec;
+import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
@@ -34,7 +35,7 @@ public class Main {
     rcont.display();
     System.out.println();
 
-    System.out.println("grade : " + mv1.highestGrade());
+    System.out.println("grades : " + Arrays.toString(mv1.grades()));
     System.out.println("norm  : " + mv1.norm());
     mv1.clear();
     if (mv1.isEmpty())

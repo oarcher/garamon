@@ -2,10 +2,13 @@ package org.garamon.project_namespace;
 
 import java.lang.ref.Cleaner;
 import java.lang.foreign.MemorySegment;
+import java.lang.foreign.Arena;
+import java.lang.foreign.ValueLayout;
 import org.garamon.project_namespace.Mvec_h;
 
 public final class Mvec implements AutoCloseable {
     private static final Cleaner CLEANER = Cleaner.create();
+
 
     private static final class Native implements Runnable {
         MemorySegment seg;
@@ -90,6 +93,30 @@ project_static_multivector_one_component
 
     public double norm() {
         return Mvec_h.Mvec_norm(seg());
+    }
+
+    public int[] grades() {
+        // to get grades vector, we need to temporary allocate a C array, and
+        // copy it to a java array
+        int count = (int) Mvec_h.Mvec_get_grades_count(seg());
+        if (count == 0) return new int[0];
+
+        try (Arena arena = Arena.ofConfined()) {
+            long elemSize = ValueLayout.JAVA_INT.byteSize();
+            long bytes    = elemSize * (long) count;
+
+            MemorySegment out = arena.allocate(bytes, ValueLayout.JAVA_INT.byteAlignment());
+
+            int written = Mvec_h.Mvec_copy_grades(seg(), out, count);
+            int n = Math.min(written, count);
+
+            // copy to int[]
+            int[] res = new int[n];
+            for (int i = 0; i < n; i++) {
+                res[i] = out.getAtIndex(ValueLayout.JAVA_INT, i);
+            }
+            return res;
+        }
     }
 
     public int highestGrade() {

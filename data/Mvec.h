@@ -89,7 +89,8 @@ project_basis_vector_index
     double Mvec_norm(const Mvec_C mv);
     double Mvec_quadratic_norm(const Mvec_C mv);
     int Mvec_get_highest_grade(const Mvec_C mv);
-    unsigned int *Mvec_get_grades(const Mvec_C mv, int *count);
+    unsigned int Mvec_get_grades_count(const Mvec_C mv);
+    int Mvec_copy_grades(Mvec_C mv, unsigned int* out, int cap);
     Mvec_C Mvec_get_grade_component(const Mvec_C mv, int grade);
     bool Mvec_is_grade(const Mvec_C mv, unsigned int grade);
     void Mvec_clear(Mvec_C mv, int grade);
