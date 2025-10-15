@@ -46,6 +46,7 @@ int main(int argc, char** argv){
     std::string projectDirectory      = outputDirectory  + "garamon_" + metaData.namespaceName;
     std::string srcDirectoryMain      = projectDirectory + "/src";
     std::string srcDirectory          = projectDirectory + "/src/" + metaData.namespaceName;
+    std::string srcJavaDirectory      = srcDirectory + "/java";
     std::string docDirectory          = projectDirectory + "/doc";
     std::string docImageDirectory     = projectDirectory + "/doc/images";
     std::string docHowToDirectory     = projectDirectory + "/doc/HOWTO";
@@ -64,6 +65,7 @@ int main(int argc, char** argv){
     makeDirectory(projectDirectory);
     makeDirectory(srcDirectoryMain);
     makeDirectory(srcDirectory);
+    makeDirectory(srcJavaDirectory);
     makeDirectory(docDirectory);
     makeDirectory(docImageDirectory);
     makeDirectory(docHowToDirectory);
@@ -409,13 +411,13 @@ int main(int argc, char** argv){
     substitute(data, "project_second_vector_basis", metaData.basisVectorName[1]);
     writeFile(data, srcSampleDirectory + "/Main.java");
 
-    // add the sample Mvec.java (TODO: move to package)
-    data = readFile(templateDataDirectory + "sample/src/Mvec.java");
+    // add Mvec.java (OO interface to Mvec_h)
+    data = readFile(templateDataDirectory + "java/src/org/garamon/Mvec.java");
     substitute(data, "project_namespace", metaData.namespaceName);
     substitute(data, "project_first_vector_basis", metaData.basisVectorName[0]);
     substitute(data, "project_second_vector_basis", metaData.basisVectorName[1]);
     substitute(data, "project_static_multivector_one_component", multivectorComponentBuilder(metaData, staticOneComponentMultivectorPrototypeJava())); // i.e. Mvec a = 2 * cga::e12()
-    writeFile(data, srcSampleDirectory + "/Mvec.java");
+    writeFile(data, srcJavaDirectory + "/Mvec.java");
 
     // PythonBindings.cpp
     data = readFile(templateDataDirectory + "PythonBindings.cpp");

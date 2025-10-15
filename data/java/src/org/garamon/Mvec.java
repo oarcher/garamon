@@ -1,3 +1,5 @@
+package org.garamon.project_namespace;
+
 import java.lang.ref.Cleaner;
 import java.lang.foreign.MemorySegment;
 import org.garamon.project_namespace.Mvec_h;
