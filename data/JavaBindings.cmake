@@ -9,7 +9,7 @@ set(MVEC_PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/src/cmake_project_name_origi
 # Find Java (javac/jar)
 find_package(Java COMPONENTS Development REQUIRED)
 if (NOT EXISTS ${JEXTRACT_EXECUTABLE})
-  message(FATAL_ERROR "jextract not found: ${JEXTRACT_EXECUTABLE}")
+  message(FATAL_ERROR "jextract not found: ${JEXTRACT_EXECUTABLE}. set -DJEXTRACT_EXECUTABLE=...")
 endif()
 
 # Java build directories
@@ -28,7 +28,7 @@ add_custom_command(
   COMMAND ${CMAKE_COMMAND} -E make_directory ${JAVA_GEN_DIR}
   COMMAND ${JEXTRACT_EXECUTABLE}
           -t org.garamon.cmake_project_name_original_case
-          -l :$<TARGET_FILE:cmake_project_name_original_case>
+          -l cmake_project_name_original_case
           --output ${JAVA_GEN_DIR}
           ${MVEC_PUBLIC_HEADER}
   COMMAND ${CMAKE_COMMAND} -E touch ${JAVA_GEN_DIR}/.stamp
@@ -66,7 +66,7 @@ add_custom_target(run_java
   COMMAND ${CMAKE_COMMAND} -E echo "Running demo…"
   COMMAND ${Java_JAVAC_EXECUTABLE} -cp ${JAVA_OUT_DIR} -d ${JAVA_OUT_DIR} ${JAVA_MAIN} "${CMAKE_CURRENT_SOURCE_DIR}/sample/src/Mvec.java"
   COMMAND ${CMAKE_COMMAND} -E env
-          LD_LIBRARY_PATH=$<TARGET_FILE_DIR:cmake_project_name_original_case>
+          #LD_LIBRARY_PATH=$<TARGET_FILE_DIR:cmake_project_name_original_case>
           java --enable-native-access=ALL-UNNAMED -cp ${JAVA_OUT_DIR} Main
   DEPENDS javac_bindings cmake_project_name_original_case
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
