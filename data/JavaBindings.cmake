@@ -103,16 +103,14 @@ add_custom_target(javadoc_jar ALL
 # sources jar
 add_custom_command(
   OUTPUT "${JAVA_OUT_DIR}/cmake_project_name_original_case-sources.jar"
-  COMMAND "${CMAKE_COMMAND}" -E tar cf
+  COMMAND "${Java_JAR_EXECUTABLE}" cf
           "${JAVA_OUT_DIR}/cmake_project_name_original_case-sources.jar"
-          --format=zip
           -C "${JAVA_SRC_DIR}" .
   DEPENDS jextract_bindings copy_mvec_java
   COMMENT "Packaging cmake_project_name_original_case-sources.jar"
 )
 add_custom_target(sources_jar ALL
   DEPENDS "${JAVA_OUT_DIR}/cmake_project_name_original_case-sources.jar")
-
 
 # sample demo
 set(JAVA_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/sample/src/Main.java")
