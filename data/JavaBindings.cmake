@@ -78,11 +78,41 @@ add_custom_target(javac_bindings ALL DEPENDS "${MVEC_H_CLASS}" "${MVEC_CLASS}")
 
 # JAR
 set(JAVA_JAR "${JAVA_OUT_DIR}/cmake_project_name_original_case.jar")
-add_custom_target(cmake_project_name_original_case_jar
+add_custom_target(jar
   COMMAND ${CMAKE_COMMAND} -E echo "Packaging JAR…"
   COMMAND ${Java_JAR_EXECUTABLE} cf ${JAVA_JAR} -C ${JAVA_OUT_DIR} .
   DEPENDS javac_bindings
 )
+
+# Javadoc
+add_custom_command(
+  OUTPUT "${JAVA_OUT_DIR}/cmake_project_name_original_case-javadoc.jar"
+  COMMAND "${Java_JAVADOC_EXECUTABLE}"
+          -d "${JAVA_OUT_DIR}/docs"
+          -sourcepath "${JAVA_SRC_DIR}"
+          org.garamon.cmake_project_name_original_case
+  COMMAND "${Java_JAR_EXECUTABLE}" cf
+          "${JAVA_OUT_DIR}/cmake_project_name_original_case-javadoc.jar"
+          -C "${JAVA_OUT_DIR}/docs" .
+  DEPENDS javac_bindings
+  COMMENT "Building javadoc and javadoc.jar"
+)
+add_custom_target(javadoc_jar ALL
+  DEPENDS "${JAVA_OUT_DIR}/cmake_project_name_original_case-javadoc.jar")
+
+# sources jar
+add_custom_command(
+  OUTPUT "${JAVA_OUT_DIR}/cmake_project_name_original_case-sources.jar"
+  COMMAND "${CMAKE_COMMAND}" -E tar cf
+          "${JAVA_OUT_DIR}/cmake_project_name_original_case-sources.jar"
+          --format=zip
+          -C "${JAVA_SRC_DIR}" .
+  DEPENDS jextract_bindings copy_mvec_java
+  COMMENT "Packaging cmake_project_name_original_case-sources.jar"
+)
+add_custom_target(sources_jar ALL
+  DEPENDS "${JAVA_OUT_DIR}/cmake_project_name_original_case-sources.jar")
+
 
 # sample demo
 set(JAVA_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/sample/src/Main.java")
@@ -92,6 +122,11 @@ add_custom_target(run_java
   COMMAND ${CMAKE_COMMAND} -E env
           #LD_LIBRARY_PATH=$<TARGET_FILE_DIR:cmake_project_name_original_case>
           java --enable-native-access=ALL-UNNAMED -cp ${JAVA_JAR} ${JAVA_MAIN}
-  DEPENDS cmake_project_name_original_case_jar
+  DEPENDS jar
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+add_custom_target(all_java
+    COMMENT "Build and run all Java-related targets"
+)
+add_dependencies(all_java run_java javadoc_jar sources_jar)

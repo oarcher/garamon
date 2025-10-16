@@ -1,14 +1,14 @@
 // Copyright (c) 2018 by University Paris-Est Marne-la-Vallee
 // Mvec.h
 // This file is part of the Garamon for project_namespace.
-// Authors: Stephane Breuils and Vincent Nozick
+// Authors: Stephane Breuils, Vincent Nozick and Olivier Archer
 // Contact: vincent.nozick@u-pem.fr
 //
 // Licence MIT
 // A a copy of the MIT License is given along with this program
 
 /// \file Mvec.h
-/// \author Stephane Breuils, Vincent Nozick
+/// \author Stephane Breuils, Vincent Nozick, Olivier Archer
 /// \brief C wrapper for the Mvec class in the Geometric algebra of project_namespace.
 
 #ifndef project_inclusion_guard
