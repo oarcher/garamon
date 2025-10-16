@@ -278,6 +278,7 @@ int main(int argc, char** argv){
     data = readFile(templateDataDirectory + "Mvec.h");
     substitute(data, "project_inclusion_guard", upperCaseNamespace + "_MVEC_H__");
     substitute(data, "project_namespace", metaData.namespaceName);
+    substitute(data, "project_basis_blade_infos", multivectorComponentBuilder(metaData, "    X(project_grade_blade, project_homogeneous_index_blade, project_xor_index_blade, \"project_name_blade\" ) \\\n"));
     substitute(data, "project_static_multivector_one_component", multivectorComponentBuilder(metaData, staticOneComponentMultivectorPrototypeH())); // i.e. Mvec a = 2 * cga::e12()
     if (metaData.fullRankMetric == true)
     {

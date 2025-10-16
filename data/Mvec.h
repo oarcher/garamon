@@ -16,12 +16,22 @@
 
 #include <stdbool.h>
 
+// For each basis blade: grade, pos in the multivector array, xor index, name
+// This is needed to allow the generated algebra to implement a basic template parser
+// X(grade, pos, xor, name)
+#ifndef BLADE_LIST
+#define BLADE_LIST(X) \
+project_basis_blade_infos
+#endif
+#define PROJECT_NAMESPACE            "project_namespace"
+#define PROJECT_FIRST_VECTOR_BASIS   "project_first_vector_basis"
+#define PROJECT_SECOND_VECTOR_BASIS  "project_second_vector_basis"
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-project_basis_vector_index
 
     // Opaque struct for Mvec
     typedef void* Mvec_C;
@@ -118,6 +128,13 @@ project_singular_metric_comment_begin
     Mvec_C Mvec_outer_dual_dual(const Mvec_C mv1, const Mvec_C mv2);
     Mvec_C Mvec_dual(const Mvec_C mv);
 project_singular_metric_comment_end
+
+    // Garamon parser, used by other bindings that are handled outside Garamon
+    const char* garamon_parser(
+        const char* data,
+        const char* tmpl_one_component,
+        const char* tmpl_constants
+    );
 
 #ifdef __cplusplus
 }
