@@ -20,11 +20,6 @@ if (BUILD_PYTHON)
     find_package(pybind11 REQUIRED)
 endif()
 
-option(BUILD_JAVA "Build Java bindings with jextract" OFF)
-if (BUILD_JAVA)
-  include(JavaBindings.cmake)
-endif()
-
 
 # call the CMakeLists.txt to make the documentation (Doxygen)
 # > 'make html' to generate the documentation
@@ -37,7 +32,7 @@ endif()
 
 
 # files to compile
-set(source_files src/cmake_project_name_original_case/Mvec.cpp)
+set(source_files src/cmake_project_name_original_case/Mvec.cpp src/cmake_project_name_original_case/mini_generator.cpp)
 file(GLOB_RECURSE header_files src/cmake_project_name_original_case/*.hpp)
 
 # display info

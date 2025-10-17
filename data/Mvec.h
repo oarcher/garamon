@@ -18,7 +18,17 @@
 
 // For each basis blade: grade, pos in the multivector array, xor index, name
 // This is needed to allow the generated algebra to implement a basic template parser
-// X(grade, pos, xor, name)
+// X(grade, pos, xor, name):
+// #define BLADE_LIST(X) 
+//     X(1, 0, 1, "0" ) 
+//     X(1, 1, 2, "1" ) 
+//     ...
+//     X(6, 5, 125, "02345i" ) 
+//     X(6, 6, 126, "12345i" ) 
+//     X(7, 0, 127, "012345i" )
+// 
+
+
 #ifndef BLADE_LIST
 #define BLADE_LIST(X) \
 project_basis_blade_infos

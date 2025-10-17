@@ -303,19 +303,6 @@ std::string staticOneComponentMultivectorPrototypeC(){
     return res;
 }
 
-std::string staticOneComponentMultivectorPrototypeJava(){
-    std::string res = R"(
-    /**
-     * @return a multivector that contains only the unit basis k-vector project_name_blade.
-     */
-    public static Mvec eproject_name_blade(){
-        return new Mvec(Mvec_h.Mvec_eproject_name_blade());
-    }
-    
-)";
-    return res;
-}
-
 
 // prototype of the methods namespace::e12()
 // the purpose is to generate the methods designed to assign to a specific blade of the multivector a component (scalar).
@@ -343,11 +330,6 @@ std::string oneComponentMultivectorPrototype(){
 // ...
 std::string constantsDefinition(){
     std::string res = "    const unsigned int Eproject_name_blade = project_xor_index_blade;\n";
-    return res;
-}
-
-std::string constantsDefinitionJava(){
-    std::string res = "    int Eproject_name_blade = project_xor_index_blade;\n";
     return res;
 }
 

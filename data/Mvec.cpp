@@ -15,10 +15,7 @@
 #include "project_namespace/Mvec.hpp"
 #include <vector>   // For Mvec_get_grades
 #include <iostream> // For Mvec_display
-#include <cassert>
-#include <regex>
-#include <string>
-#include <cstring>
+
 
 
 using namespace project_namespace;
@@ -28,28 +25,6 @@ static inline Mvec<double>*       to_impl(Mvec_C h)       { return reinterpret_c
 static inline Mvec<double> const* to_impl_c(Mvec_C h)     { return reinterpret_cast<Mvec<double> const*>(h); }
 static inline Mvec_C              to_handle(Mvec<double>* p){ return reinterpret_cast<Mvec_C>(p); }
 
-struct BladeInfo { unsigned grade; unsigned pos; unsigned xorIndex; const char* name; };
-
-#ifndef DEFINE_BLADES
-  #define X(g,p,x,n) { (unsigned)(g), (unsigned)(p), (unsigned)(x), (n) },
-  static const BladeInfo kBlades[] = { BLADE_LIST(X) };
-  #undef  X
-  static const unsigned kBladeCount = (unsigned)(sizeof(kBlades)/sizeof(kBlades[0]));
-#endif
-
-inline std::string render_block_from_template(const std::string& tmpl) {
-    std::string out; out.reserve(4096);
-    for (unsigned i = 0; i < kBladeCount; ++i) {
-        const BladeInfo& b = kBlades[i];
-        std::string cur = tmpl;
-        cur = std::regex_replace(cur, std::regex("project_name_blade"),                 b.name);
-        cur = std::regex_replace(cur, std::regex("project_homogeneous_index_blade"),   std::to_string(b.pos));
-        cur = std::regex_replace(cur, std::regex("project_xor_index_blade"),           std::to_string(b.xorIndex));
-        cur = std::regex_replace(cur, std::regex("project_grade_blade"),               std::to_string(b.grade));
-        out += cur;
-    }
-    return out;
-}
 
 // All exported C functions
 extern "C" {
@@ -493,38 +468,5 @@ project_singular_metric_comment_end
 
 project_static_multivector_one_component
 
-// garamon_parser implements a simple template engine
-// embededed in the generated library to allow basic code generation
-const char* garamon_parser(
-    const char* data,
-    const char* tmpl_one_component,
-    const char* tmpl_constants
-){
-    if (!data || !tmpl_one_component || !tmpl_constants) return nullptr;
-
-    try {
-        std::string out(data);
-
-        out = std::regex_replace(out, std::regex("PROJECT_NAMESPACE"),
-                                 PROJECT_NAMESPACE);
-        out = std::regex_replace(out, std::regex("PROJECT_FIRST_VECTOR_BASIS"),
-                                 PROJECT_FIRST_VECTOR_BASIS);
-        out = std::regex_replace(out, std::regex("PROJECT_SECOND_VECTOR_BASIS"),
-                                 PROJECT_SECOND_VECTOR_BASIS);
-
-        const std::string one  = render_block_from_template(std::string(tmpl_one_component));
-        out = std::regex_replace(out, std::regex("PROJECT_STATIC_MULTIVECTOR_ONE_COMPONENT"), one);
-
-        const std::string cons = render_block_from_template(std::string(tmpl_constants));
-        out = std::regex_replace(out, std::regex("PROJECT_BASIS_VECTOR_INDEX"), cons);
-
-        char* res = new char[out.size() + 1];
-        std::memcpy(res, out.data(), out.size());
-        res[out.size()] = '\0';
-        return res;
-    } catch (...) {
-        return nullptr;
-    }
-}
 
 } // extern "C"

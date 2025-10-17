@@ -46,7 +46,6 @@ int main(int argc, char** argv){
     std::string projectDirectory      = outputDirectory  + "garamon_" + metaData.namespaceName;
     std::string srcDirectoryMain      = projectDirectory + "/src";
     std::string srcDirectory          = projectDirectory + "/src/" + metaData.namespaceName;
-    std::string srcJavaDirectory      = srcDirectory + "/java";
     std::string docDirectory          = projectDirectory + "/doc";
     std::string docImageDirectory     = projectDirectory + "/doc/images";
     std::string docHowToDirectory     = projectDirectory + "/doc/HOWTO";
@@ -65,7 +64,6 @@ int main(int argc, char** argv){
     makeDirectory(projectDirectory);
     makeDirectory(srcDirectoryMain);
     makeDirectory(srcDirectory);
-    makeDirectory(srcJavaDirectory);
     makeDirectory(docDirectory);
     makeDirectory(docImageDirectory);
     makeDirectory(docHowToDirectory);
@@ -88,11 +86,6 @@ int main(int argc, char** argv){
     data = readFile(templateDataDirectory + "CMakeLists.txt");
     substitute(data,"cmake_project_name_original_case", metaData.namespaceName);
     writeFile(data, projectDirectory + "/CMakeLists.txt");
-
-    // add the JavaBindings.cmake
-    data = readFile(templateDataDirectory + "JavaBindings.cmake");
-    substitute(data, "cmake_project_name_original_case", metaData.namespaceName);
-    writeFile(data, projectDirectory + "/JavaBindings.cmake");
 
     // add the documentation CMakeLists.txt
     data = readFile(templateDataDirectory + "doc/CMakeLists.txt");
@@ -246,6 +239,7 @@ int main(int argc, char** argv){
     data = readFile(templateDataDirectory + "Mvec.hpp");
     substitute(data,"project_inclusion_guard", upperCaseNamespace + "_MULTI_VECTOR_HPP__");
     substitute(data,"project_namespace", metaData.namespaceName);
+
     substitute(data,"project_multivector_one_component", multivectorComponentBuilder(metaData,oneComponentMultivectorPrototype())); // i.e. Mvec a = 2 * b.e12()
     substitute(data,"project_static_multivector_one_component", multivectorComponentBuilder(metaData,staticOneComponentMultivectorPrototype())); // i.e. Mvec a = 2 * cga::e12()
     substitute(data,"project_algebra_dimension", std::to_string(metaData.dimension));
@@ -267,17 +261,13 @@ int main(int argc, char** argv){
     else  substitute(data,"project_select_recursive_geometric_product_template","");
     writeFile(data, srcDirectory + "/Mvec.hpp");
 
-
-    // Mvec.cpp
-    // data = readFile(templateDataDirectory + "Mvec.cpp");
-    // substitute(data, "project_namespace", metaData.namespaceName);
-    // writeFile(data, srcDirectory + "/Mvec.cpp");
-
     // Mvec.h (C wrapper)
     std::cout << "  Mvec C wrapper header ..." << std::endl;
     data = readFile(templateDataDirectory + "Mvec.h");
     substitute(data, "project_inclusion_guard", upperCaseNamespace + "_MVEC_H__");
     substitute(data, "project_namespace", metaData.namespaceName);
+    substitute(data,"project_first_vector_basis", metaData.basisVectorName[0]);
+    substitute(data,"project_second_vector_basis", metaData.basisVectorName[1]);
     substitute(data, "project_basis_blade_infos", multivectorComponentBuilder(metaData, "    X(project_grade_blade, project_homogeneous_index_blade, project_xor_index_blade, \"project_name_blade\" ) \\\n"));
     substitute(data, "project_static_multivector_one_component", multivectorComponentBuilder(metaData, staticOneComponentMultivectorPrototypeH())); // i.e. Mvec a = 2 * cga::e12()
     if (metaData.fullRankMetric == true)
@@ -314,6 +304,15 @@ int main(int argc, char** argv){
         substitute(data, "project_singular_metric_comment_end", singularMetricCommentEnd());
     }
     writeFile(data, srcDirectory + "/Mvec.cpp");
+
+    // mini_generator.cpp (C wrapper parser)
+    std::cout << "  mini_generator C wrapper parser ..." << std::endl;
+    data = readFile(templateDataDirectory + "mini_generator.cpp");
+    // mini_generator.cpp contain string that should *not* be interpreted
+    // but project_namespace is a special case that should be partially replaced
+    substitute(data,"project_namespace/", metaData.namespaceName + "/");
+    substitute(data,"project_namespace;", metaData.namespaceName + ";");
+    writeFile(data, srcDirectory + "/mini_generator.cpp");
 
 
     // Outer.hpp
@@ -404,22 +403,6 @@ int main(int argc, char** argv){
     substitute(data,"project_first_vector_basis", metaData.basisVectorName[0]);
     substitute(data,"project_second_vector_basis", metaData.basisVectorName[1]);
     writeFile(data, srcSampleDirectory + "/main.cpp");
-
-    // add the sample Main.java
-    data = readFile(templateDataDirectory + "sample/src/Main.java");
-    substitute(data, "project_namespace", metaData.namespaceName);
-    substitute(data, "project_first_vector_basis", metaData.basisVectorName[0]);
-    substitute(data, "project_second_vector_basis", metaData.basisVectorName[1]);
-    writeFile(data, srcSampleDirectory + "/Main.java");
-
-    // add Mvec.java (OO interface to Mvec_h)
-    data = readFile(templateDataDirectory + "java/src/org/garamon/Mvec.java");
-    substitute(data, "project_namespace", metaData.namespaceName);
-    substitute(data, "project_first_vector_basis", metaData.basisVectorName[0]);
-    substitute(data, "project_second_vector_basis", metaData.basisVectorName[1]);
-    substitute(data, "project_static_multivector_one_component", multivectorComponentBuilder(metaData, staticOneComponentMultivectorPrototypeJava())); // i.e. Mvec a = 2 * cga::e12()
-    substitute(data, "project_basis_vector_index", multivectorComponentBuilder(metaData, constantsDefinitionJava()));
-    writeFile(data, srcJavaDirectory + "/Mvec.java");
 
     // PythonBindings.cpp
     data = readFile(templateDataDirectory + "PythonBindings.cpp");
