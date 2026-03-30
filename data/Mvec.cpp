@@ -418,10 +418,12 @@ Mvec_C Mvec_I(void)
     return to_handle(new Mvec<double>(I<double>()));
 }
 
+project_singular_metric_comment_begin
 Mvec_C Mvec_Iinv(void)
 {
     return to_handle(new Mvec<double>(Iinv<double>()));
 }
+project_singular_metric_comment_end
 
 Mvec_C Mvec_scalar_product(Mvec_C mv1, Mvec_C mv2)
 {

@@ -128,7 +128,9 @@ project_static_multivector_one_component
     Mvec_C Mvec_left_contraction_func(const Mvec_C mv1, const Mvec_C mv2);
     Mvec_C Mvec_right_contraction_func(const Mvec_C mv1, const Mvec_C mv2);
     Mvec_C Mvec_I(void);
+project_singular_metric_comment_begin
     Mvec_C Mvec_Iinv(void);
+project_singular_metric_comment_end
     Mvec_C Mvec_scalar_product(const Mvec_C mv1, const Mvec_C mv2);
     Mvec_C Mvec_dot_product(const Mvec_C mv1, const Mvec_C mv2);
 
