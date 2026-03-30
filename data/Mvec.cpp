@@ -13,6 +13,7 @@
 
 #include "project_namespace/Mvec.h"
 #include "project_namespace/Mvec.hpp"
+#include <cassert>  // For assert
 #include <vector>   // For Mvec_get_grades
 #include <iostream> // For Mvec_display
 
