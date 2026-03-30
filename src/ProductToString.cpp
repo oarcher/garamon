@@ -570,7 +570,7 @@ std::string fastDualUtilities(unsigned int dimension, const ProductTools& produc
                               std::string srcDirectory,
                               std::string& fastDualComponents){
 
-    std::string outputStringPermutations="    std::array<std::vector<unsigned int>, " + std::to_string(dimension+1) + "> dualPermutations = {{ ";
+    std::string outputStringPermutations="    const std::array<std::vector<unsigned int>, " + std::to_string(dimension+1) + "> dualPermutations = {{ ";
 
     // this string was previously initialized at library compile time. Now this is done in a similar way to the construction of the transformation matrices
     // loading it in a file
